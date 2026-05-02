@@ -6,21 +6,683 @@
 }
 
 @theme inline {
+  /* Brand Palette - Krishak Organic (Green/Emerald Theme) */
+  --color-saffron-600: #16a34a;
+  --color-saffron-500: #22c55e;
+  --color-saffron-400: #4ade80;
+  --color-maroon-700: #15803d;
+  --color-maroon-600: #166534;
+  --color-cream-50: #f0fdf4;
+  --color-cream-100: #dcfce7;
+  --color-gold-600: #16a34a;
+  --color-gold-400: #4ade80;
+  /* Emerald aliases for direct use */
+  --color-emerald-600: #16a34a;
+  --color-emerald-700: #15803d;
+  --color-emerald-500: #22c55e;
+  --color-emerald-400: #4ade80;
+  --color-emerald-50: #f0fdf4;
+  --color-emerald-100: #dcfce7;
+
+  /* Neutrals */
+  --color-neutral-900: #0f172a;
+  --color-neutral-800: #1f2937;
+  --color-neutral-700: #374151;
+  --color-neutral-600: #4b5563;
+  --color-neutral-500: #6b7280;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-50: #f9fafb;
+
+  /* Mapped tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: var(--color-saffron-600);
+  --color-primary-foreground: #111827;
+  --color-secondary: var(--color-maroon-700);
+  --color-secondary-foreground: #ffffff;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Typography */
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui);
+  --font-heading: var(--font-geist-sans, ui-sans-serif, system-ui);
+  --font-mono: var(--font-geist-mono, ui-monospace, SFMono-Regular);
+
+  /* Type scale */
+  --text-display: 4rem;
+  /* 64px */
+  --text-h1: 3rem;
+  /* 48px */
+  --text-h2: 2.5rem;
+  /* 40px */
+  --text-h3: 2rem;
+  /* 32px */
+  --text-h4: 1.5rem;
+  /* 24px */
+  --text-body-lg: 1.125rem;
+  /* 18px */
+  --text-body: 1rem;
+  /* 16px */
+  --text-sm: 0.875rem;
+  /* 14px */
+
+  /* Radii & shadows */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.07);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Headings */
+.heading-display {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: var(--text-display);
+  line-height: 1.1;
+}
+
+.heading-h1 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--text-h1);
+  line-height: 1.15;
+}
+
+.heading-h2 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--text-h2);
+  line-height: 1.2;
+}
+
+.heading-h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--text-h3);
+  line-height: 1.25;
+}
+
+.heading-h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-h4);
+  line-height: 1.3;
+}
+
+/* Text utilities */
+.text-body-lg {
+  font-size: var(--text-body-lg);
+}
+
+.text-body {
+  font-size: var(--text-body);
+}
+
+.text-sm {
+  font-size: var(--text-sm);
+}
+
+/* Gradients */
+.bg-hero-gradient {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-saffron-600),
+    var(--color-maroon-700)
+  );
+}
+
+/* Buttons base (used by UI components) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  box-shadow: var(--shadow-soft);
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--saffron-600);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  background: var(--color-secondary);
+  color: var(--color-secondary-foreground);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-secondary);
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--color-neutral-200);
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.ribbon1 {
+  position: absolute;
+  top: -4px;
+  right: 10px;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.ribbon1:after {
+  position: absolute;
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 45px solid transparent;
+  border-right: 45px solid transparent;
+  border-top: 10px solid #f8463f;
+  bottom: -10px;
+  left: 0;
+}
+
+.ribbon1 span {
+  position: relative;
+  display: block;
+  text-align: center;
+  background: #f8463f;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 8px 4px 6px;
+  border-top-right-radius: 4px;
+  width: 90px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ribbon1 span:before,
+.ribbon1 span:after {
+  position: absolute;
+  content: "";
+}
+
+.ribbon1 span:before {
+  height: 6px;
+  width: 6px;
+  left: -6px;
+  top: 0;
+  background: #f8463f;
+}
+
+.ribbon1 span:after {
+  height: 6px;
+  width: 8px;
+  left: -8px;
+  top: 0;
+  border-radius: 8px 8px 0 0;
+  background: #c02031;
+}
+
+/* Scrollbar utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Neumorphism utilities */
+.neumorphic {
+  background: #f5f1e8;
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.08),
+    -8px -8px 16px rgba(255, 255, 255, 0.9);
+  border-radius: 1rem;
+}
+
+.neumorphic-inset {
+  background: #f5f1e8;
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.08),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+  border-radius: 1rem;
+}
+
+.neumorphic-hover:hover {
+  box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.1),
+    -12px -12px 24px rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-gold {
+  background: rgba(255, 248, 231, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 153, 51, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 153, 51, 0.1);
+}
+
+/* Premium gradients */
+.bg-golden-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 153, 51, 0.1) 0%,
+    rgba(212, 175, 55, 0.15) 50%,
+    rgba(255, 153, 51, 0.1) 100%
+  );
+}
+
+/* ========================================
+   SWAADM BACKGROUND GRADIENTS - Choose Your Favorite!
+   All static (no animations) for best performance
+   ======================================== */
+
+/* OPTION 1: Soft Vertical Cream (Current - Subtle & Clean) */
+.bg-swaadm-gradient-1 {
+  background: linear-gradient(
+    180deg,
+    #fff8e7 0%,
+    #fff5dc 15%,
+    #ffead4 30%,
+    #ffe5d1 50%,
+    #fff0e0 70%,
+    #fff8e7 100%
+  );
+}
+
+/* OPTION 2: Warm Diagonal (Saffron to Cream - Bold & Vibrant) */
+.bg-swaadm-gradient-2 {
+  background: linear-gradient(
+    135deg,
+    #fff8e7 0%,
+    #ffe8cc 20%,
+    #ffd9a8 40%,
+    #ffcc8f 60%,
+    #ffe0b8 80%,
+    #fff5e0 100%
+  );
+}
+
+/* OPTION 3: Radial Glow (Center Orange Glow - Modern & Eye-catching) */
+.bg-swaadm-gradient-3 {
+  background: radial-gradient(
+    ellipse at center top,
+    #ffe5cc 0%,
+    #fff0db 30%,
+    #fff5e5 60%,
+    #fffaf0 100%
+  );
+}
+
+/* OPTION 4: Sunset Blend (Orange to Gold to Cream - Premium Feel) */
+.bg-swaadm-gradient-4 {
+  background: linear-gradient(
+    180deg,
+    #fff5e8 0%,
+    #ffedd5 15%,
+    #ffe4c4 30%,
+    #ffd9b0 45%,
+    #ffe8cc 60%,
+    #fff3e0 80%,
+    #fffaf5 100%
+  );
+}
+
+/* OPTION 5: Horizontal Stripes (Banded Effect - Unique & Stylish) */
+.bg-swaadm-gradient-5 {
+  background: linear-gradient(
+    to right,
+    #fff8e7 0%,
+    #ffedd8 25%,
+    #ffe6cc 50%,
+    #ffedd8 75%,
+    #fff8e7 100%
+  );
+}
+
+/* OPTION 6: Double Diagonal (Criss-cross - Dynamic) */
+.bg-swaadm-gradient-6 {
+  background: 
+    linear-gradient(135deg, transparent 0%, rgba(255, 153, 51, 0.05) 50%, transparent 100%),
+    linear-gradient(225deg, transparent 0%, rgba(212, 175, 55, 0.05) 50%, transparent 100%),
+    #fff8e7;
+}
+
+/* Default - Use Option 1 */
+.bg-swaadm-gradient {
+  background: linear-gradient(
+    180deg,
+    #fff8e7 0%,
+    #fff5dc 15%,
+    #ffead4 30%,
+    #ffe5d1 50%,
+    #fff0e0 70%,
+    #fff8e7 100%
+  );
+}
+
+/* Decorative background pattern - Static overlay */
+.bg-pattern-overlay {
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255, 153, 51, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 184, 77, 0.02) 0%, transparent 50%);
+}
+
+/* ========================================
+   SECTION-SPECIFIC BACKGROUNDS
+   Personalized gradients for each section
+   ======================================== */
+
+/* Hero/Banner Section - Pure Cream (Clean canvas for content) */
+.bg-section-hero {
+  background: linear-gradient(
+    180deg,
+    #fffbf0 0%,
+    #fff8e7 100%
+  );
+}
+
+/* Stats Section - Subtle Glow */
+.bg-section-stats {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 248, 231, 0.5),
+    rgba(255, 255, 255, 0.8)
+  );
+}
+
+/* Categories Section - Fresh Green tint */
+.bg-section-categories {
+  background: linear-gradient(
+    180deg,
+    #f0fdf4 0%,
+    #dcfce7 50%,
+    #f0fdf4 100%
+  );
+}
+
+/* Featured Boxes Section - Warm Orange tint */
+.bg-section-featured {
+  background: linear-gradient(
+    135deg,
+    #fff3e0 0%,
+    #ffe8d5 50%,
+    #fff5e8 100%
+  );
+}
+
+/* Benefits/Why Choose Section - Light Green */
+.bg-section-benefits {
+  background: linear-gradient(
+    180deg,
+    #dcfce7 0%,
+    #bbf7d0 30%,
+    #dcfce7 100%
+  );
+}
+
+/* How It Works Section - Clean White with Hint */
+.bg-section-steps {
+  background: linear-gradient(
+    to right,
+    #fffbf5 0%,
+    #ffffff 50%,
+    #fffbf5 100%
+  );
+}
+
+/* Customization Showcase - Rich Warmth */
+.bg-section-custom {
+  background: linear-gradient(
+    135deg,
+    #ffd9b3 0%,
+    #ffe8cc 50%,
+    #fff3e0 100%
+  );
+}
+
+/* Offers Section - Emerald Accent */
+.bg-section-offers {
+  background: linear-gradient(
+    180deg,
+    #86efac 0%,
+    #4ade80 50%,
+    #86efac 100%
+  );
+}
+
+/* Products Section (Featured Items/New Arrivals) - Pure White */
+.bg-section-products {
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #fffbf5 100%
+  );
+}
+
+/* Testimonials Section - Golden Glow */
+.bg-section-testimonials {
+  background: radial-gradient(
+    ellipse at center,
+    #ffe8cc 0%,
+    #fff3e0 60%,
+    #fffaf5 100%
+  );
+}
+
+/* Final CTA Section - Bold Green Gradient */
+.bg-section-cta {
+  background: linear-gradient(
+    135deg,
+    #16a34a 0%,
+    #22c55e 50%,
+    #15803d 100%
+  );
+}
+
+/* Generic light section */
+.bg-section-light {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 248, 231, 0.5),
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+.bg-festive-gradient {
+  background: linear-gradient(
+    135deg,
+    #fff8e7 0%,
+    #ffe5b4 25%,
+    #ffd89b 50%,
+    #ffe5b4 75%,
+    #fff8e7 100%
+  );
+}
+
+/* Ethnic border pattern */
+.ethnic-border {
+  position: relative;
+}
+
+.ethnic-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(45deg, #ff9933, #d4af37, #ff9933, #d4af37);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+/* Shimmer animation for stars */
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.star-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.star-shimmer:nth-child(1) {
+  animation-delay: 0s;
+}
+.star-shimmer:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.star-shimmer:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.star-shimmer:nth-child(4) {
+  animation-delay: 0.6s;
+}
+.star-shimmer:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modern shadow utilities */
+.shadow-3xl {
+  box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+}
+
+/* Pulse animation for decorative elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Enhanced gradient backgrounds */
+.bg-premium-gradient {
+  background: linear-gradient(
+    135deg,
+    #fff8e7 0%,
+    #ffe5b4 25%,
+    #ffd89b 50%,
+    #ffe5b4 75%,
+    #fff8e7 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Modern card hover effects */
+.card-hover-lift {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradient text utility */
+.text-gradient-premium {
+  background: linear-gradient(135deg, #ff9933, #d4af37, #800020);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Border shine effect */
+@keyframes border-shine {
+  0% {
+    border-color: rgba(255, 153, 51, 0.5);
+  }
+  50% {
+    border-color: rgba(212, 175, 55, 0.8);
+  }
+  100% {
+    border-color: rgba(255, 153, 51, 0.5);
+  }
+}
+
+.border-animate {
+  animation: border-shine 3s ease-in-out infinite;
 }
