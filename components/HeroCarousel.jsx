@@ -15,16 +15,21 @@ const defaultContent = {
 };
 
 export default function HeroCarousel({ initialImages }) {
-  const [images, setImages] = useState(initialImages || []);
+  const getInitialImages = () => {
+    if (initialImages && initialImages.length > 0) return initialImages;
+    return [{ ...defaultContent }];
+  };
+
+  const [images, setImages] = useState(getInitialImages());
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(!initialImages);
+  const [loading, setLoading] = useState(!initialImages && (!images || images.length === 0));
   const router = useRouter();
 
   useEffect(() => {
-    if (!initialImages) {
+    if (!initialImages && images.length === 0) {
       fetchHeroImages();
     }
-  }, [initialImages]);
+  }, [initialImages, images.length]);
 
   const fetchHeroImages = async () => {
     try {

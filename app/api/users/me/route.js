@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const BACKEND_API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.NEXT_PUBLIC_ADMIN_API_URL ||
-  "https://swaadm-admin.vercel.app/api";
+  "http://localhost:3001/api";
 
 export async function GET(request) {
   try {

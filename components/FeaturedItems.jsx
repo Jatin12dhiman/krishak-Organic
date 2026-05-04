@@ -203,7 +203,8 @@ export default function FeaturedItems({ title = "Featured Items", subtitle, init
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col"
+            onClick={() => router.push(`/shop/${item._id}`)}
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col cursor-pointer"
           >
             <div className="relative h-64 bg-gray-100 overflow-hidden shrink-0">
               {item.image ? (

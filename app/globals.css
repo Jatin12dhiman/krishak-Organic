@@ -308,12 +308,12 @@ body {
 }
 
 .glass-gold {
-  background: rgba(255, 248, 231, 0.8);
+  background: rgba(240, 253, 244, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 153, 51, 0.2);
-  box-shadow: 0 8px 32px rgba(255, 153, 51, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 153, 51, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 40px rgba(34, 197, 94, 0.08);
 }
 
 /* Premium gradients */
@@ -515,13 +515,13 @@ body {
   );
 }
 
-/* Testimonials Section - Golden Glow */
+/* Testimonials Section - Green Glow */
 .bg-section-testimonials {
   background: radial-gradient(
     ellipse at center,
-    #ffe8cc 0%,
-    #fff3e0 60%,
-    #fffaf5 100%
+    #dcfce7 0%,
+    #f0fdf4 60%,
+    #f7fffe 100%
   );
 }
 

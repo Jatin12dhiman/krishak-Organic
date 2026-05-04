@@ -70,7 +70,7 @@ export default function TestimonialsSection({ title = "Testimonials", subtitle, 
             className="mb-4"
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 flex items-center justify-center gap-x-2">
-              <Quote className="text-saffron-600" size={24} />
+              <Quote className="text-green-600" size={24} />
               {title}
             </h2>
           </motion.div>
@@ -106,8 +106,8 @@ export default function TestimonialsSection({ title = "Testimonials", subtitle, 
                   />
                 </div>
               ) : (
-                <div className="w-16 h-16 rounded-full bg-saffron-200 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-saffron-600">
+                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-green-700">
                     {currentTestimonial.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -147,8 +147,8 @@ export default function TestimonialsSection({ title = "Testimonials", subtitle, 
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:ring-offset-2 hover:scale-125 ${index === currentIndex
-                      ? "bg-saffron-600 w-8"
+                  className={`w-2 h-2 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 hover:scale-125 ${index === currentIndex
+                      ? "bg-green-600 w-8"
                       : "bg-gray-300 hover:bg-gray-400"
                     }`}
                   aria-label={`Go to testimonial ${index + 1}`}

@@ -5,10 +5,11 @@ export default function Footer() {
 
   const footerLinks = {
     pages: [
-      { label: "Products", href: "/products" },
-      { label: "Menu", href: "/menu" },
+      { label: "Shop", href: "/shop" },
+      { label: "About Us", href: "/about" },
+      { label: "Achievements", href: "/achievements" },
+      { label: "Testimonials", href: "/testimonials" },
       { label: "Track Order", href: "/track-order" },
-      { label: "Contact Us", href: "/contact-us" },
     ],
     account: [
       { label: "Login", href: "/login" },

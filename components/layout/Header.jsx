@@ -96,8 +96,8 @@ export default function Header({ initialCategories, initialConfig }) {
             ).length || 0;
           setUnreadCount(unread);
         }
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
+      } catch {
+        // Notifications API may not exist yet — silently ignore
       }
     };
 
@@ -122,19 +122,23 @@ export default function Header({ initialCategories, initialConfig }) {
       }
 
       if (user?._id) {
-        const res = await api.get(`/users/${user._id}/get-carts`);
-        if (res.success) {
-          const cartData = res.data;
-          setCartData(cartData);
-          setCartCount(cartData.items.length);
+        try {
+          const res = await api.get(`/users/${user._id}/get-carts`);
+          if (res.success) {
+            const cartData = res.data;
+            setCartData(cartData);
+            setCartCount(cartData.items?.length || 0);
 
-          if (typeof window !== "undefined") {
-            localStorage.setItem("cart", JSON.stringify(cartData));
+            if (typeof window !== "undefined") {
+              localStorage.setItem("cart", JSON.stringify(cartData));
+            }
           }
+        } catch {
+          // Cart API may not exist yet — silently use localStorage
         }
       }
     } catch (error) {
-      console.error("Error fetching cart:", error);
+      // Fallback to localStorage on any error
       if (typeof window !== "undefined") {
         const localCart = localStorage.getItem("cart");
         if (localCart) {
@@ -149,15 +153,15 @@ export default function Header({ initialCategories, initialConfig }) {
     }
   }, [user?._id]);
 
-  // Fetch cart data every 3 seconds
+  // Fetch cart data periodically (only when user is logged in)
   useEffect(() => {
     // Fetch immediately
     fetchCartData();
 
-    // Set up interval for every 3 seconds
+    // Set up interval for every 30 seconds (not 1s to avoid hammering the server)
     const interval = setInterval(() => {
       fetchCartData();
-    }, 1000);
+    }, 30000);
 
     const handleCartUpdate = () => {
       fetchCartData();
@@ -189,8 +193,8 @@ export default function Header({ initialCategories, initialConfig }) {
           setMinBoxQuantity(data.minimumBoxQuantity);
         }
 
-      } catch (error) {
-        console.error("Error fetching header banner:", error);
+      } catch {
+        // System config may not exist yet — silently ignore
       }
     };
 
@@ -199,7 +203,11 @@ export default function Header({ initialCategories, initialConfig }) {
 
   const handleLogout = async () => {
     await logout();
-    await api.post(`/users/${user.userId || user._id}/clear-cart`);
+    try {
+      await api.post(`/users/${user.userId || user._id}/clear-cart`);
+    } catch {
+      // clear-cart API may not exist yet
+    }
     localStorage.removeItem("cart");
     window.location.href = '/'
     setMobileMenuOpen(false);
@@ -588,17 +596,9 @@ export default function Header({ initialCategories, initialConfig }) {
               className="flex items-center gap-2 cursor-pointer h-12 md:h-18"
               onClick={() => router.push("/")}
             >
-              {!logoError ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src="/logo.png"
-                  alt="Krishak"
-                  className="h-10 w-auto object-contain"
-                  onError={() => setLogoError(true)}
-                />
-              ) : (
+              <div className="flex items-center gap-2 bg-emerald-100 p-2 rounded-xl">
                 <span className="text-2xl">🌿</span>
-              )}
+              </div>
               <span className="text-xl md:text-2xl font-bold text-emerald-600 tracking-tight">
                 Krishak
               </span>
