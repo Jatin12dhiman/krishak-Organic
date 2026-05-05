@@ -25,6 +25,7 @@ export async function GET(request) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
         Cookie: `token=${token}`, // Forward the cookie
         Origin: request.headers.get("origin") || "",
         Referer: request.headers.get("referer") || "",
@@ -32,6 +33,21 @@ export async function GET(request) {
       credentials: "include",
       redirect: "follow",
     });
+
+    // Check if the response is JSON before parsing
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      console.error(
+        `GetMe proxy: Backend returned non-JSON response (${contentType}), status: ${response.status}`
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Backend service unavailable. Please try again later.",
+        },
+        { status: 502 }
+      );
+    }
 
     const data = await response.json();
 

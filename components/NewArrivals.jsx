@@ -9,6 +9,7 @@ import { Star, ShoppingCart, Zap, Tag } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Button from "@/components/ui/Button.jsx";
+import { getImageUrl } from "@/lib/utils";
 
 export default function NewArrivals({ title = "New Arrivals", subtitle, initialData }) {
   const router = useRouter();
@@ -25,7 +26,14 @@ export default function NewArrivals({ title = "New Arrivals", subtitle, initialD
           params: { isNewArrival: "true", isActive: "true", limit: 8, page: 1 },
         });
         const data = res?.data ?? res;
-        const list = Array.isArray(data) ? data : data?.items || [];
+        let list = Array.isArray(data) ? data : data?.items || [];
+        if (list.length === 0) {
+          const fallback = await api.get("/items", {
+            params: { isActive: "true", limit: 8, page: 2 },
+          });
+          const fd = fallback?.data ?? fallback;
+          list = Array.isArray(fd) ? fd : fd?.items || [];
+        }
         if (active) setItems(list);
       } catch (e) {
         if (active) console.error("Failed to load new arrivals:", e);
@@ -204,7 +212,7 @@ export default function NewArrivals({ title = "New Arrivals", subtitle, initialD
                   className="relative w-full h-full"
                 >
                   <Image
-                    src={item.image}
+                    src={getImageUrl(item.image)}
                     alt={item.name}
                     fill
                     className="object-cover"

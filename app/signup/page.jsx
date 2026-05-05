@@ -1,7 +1,7 @@
 "use client";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, User, Phone, X, Leaf } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Phone, X, Leaf, Gift } from "lucide-react";
 import Button from "@/components/ui/Button.jsx";
 import Input from "@/components/ui/Input.jsx";
 import { api } from "@/lib/api";
@@ -79,9 +79,10 @@ function WelcomeModal({ isOpen, onClose, isNewUser, isCodeSent, reason }) {
 function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const referralCode = searchParams.get("referralCode");
+  const referralCodeFromUrl = searchParams.get("referralCode");
   const from = searchParams.get("from");
   const fromCheckout = from === "checkout";
+  const [manualReferralCode, setManualReferralCode] = useState(referralCodeFromUrl || "");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -109,7 +110,7 @@ function SignupContent() {
         email: data.email,
         phoneNumber: data.phone,
         password: data.password,
-        referralCode: referralCode || null,
+        referralCode: manualReferralCode.trim() || null,
       });
 
       if (res.success) {
@@ -291,6 +292,35 @@ function SignupContent() {
                     )}
                   </button>
                 </div>
+              </div>
+
+              {/* Referral Code Field */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <Gift className="text-emerald-600" size={20} />
+                  <label className="block text-sm font-medium text-neutral-700">
+                    Referral Code <span className="text-neutral-400 font-normal">(optional)</span>
+                  </label>
+                </div>
+                {referralCodeFromUrl ? (
+                  <div className="flex items-center gap-3 bg-emerald-50 border-2 border-emerald-300 rounded-lg px-4 py-3">
+                    <Gift size={18} className="text-emerald-600 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-emerald-800 font-bold tracking-widest font-mono text-lg">{manualReferralCode}</p>
+                      <p className="text-emerald-600 text-xs">Referral code applied — you'll get a discount on your first order!</p>
+                    </div>
+                  </div>
+                ) : (
+                  <Input
+                    type="text"
+                    value={manualReferralCode}
+                    onChange={(e) => setManualReferralCode(e.target.value.toUpperCase())}
+                    placeholder="Enter referral code (e.g. ABC12345)"
+                    className="w-full focus:ring-emerald-500 font-mono tracking-widest uppercase"
+                    disabled={loading}
+                    maxLength={10}
+                  />
+                )}
               </div>
 
               <Button type="submit" className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 transition-all duration-300" disabled={loading}>

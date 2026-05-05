@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 const ImageCarousel = ({ images, height = "h-64", objectFit = "object-contain" }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -28,7 +29,7 @@ const ImageCarousel = ({ images, height = "h-64", objectFit = "object-contain" }
             {/* Main Image */}
             <div className="w-full h-full relative">
                 <Image
-                    src={images[currentIndex]}
+                    src={getImageUrl(images[currentIndex]) || images[currentIndex]}
                     alt={`Slide ${currentIndex + 1}`}
                     fill
                     className={`${objectFit} p-4 transition-transform duration-500`}

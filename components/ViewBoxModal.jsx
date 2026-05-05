@@ -4,6 +4,7 @@ import { X, Package, Box as BoxIcon, Layers, Info } from "lucide-react";
 import Modal from "@/components/ui/Modal.jsx";
 import Image from "next/image";
 import ImageCarousel from "./ImageCarousel";
+import { getImageUrl } from "@/lib/utils";
 
 export default function ViewBoxModal({ isOpen, onClose, box }) {
     if (!isOpen || !box) return null;
@@ -71,7 +72,7 @@ export default function ViewBoxModal({ isOpen, onClose, box }) {
                                         <div className="relative w-14 h-14 bg-white rounded-lg border border-neutral-100 overflow-hidden shrink-0">
                                             {item?.image ? (
                                                 <Image
-                                                    src={item.image}
+                                                    src={getImageUrl(item.image)}
                                                     alt={item.name}
                                                     fill
                                                     className="object-cover p-1"

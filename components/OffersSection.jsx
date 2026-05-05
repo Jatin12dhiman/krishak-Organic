@@ -6,6 +6,7 @@ import Skeleton from "@/components/ui/Skeleton.jsx";
 import { Tag, Copy, Check, Minus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 export default function OffersSection({ title = "Offers", subtitle, initialData }) {
   const [offers, setOffers] = useState(initialData || []);
@@ -129,7 +130,7 @@ export default function OffersSection({ title = "Offers", subtitle, initialData 
                   {offer.image && (
                     <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-saffron-50 to-gold-50">
                       <Image
-                        src={offer.image}
+                        src={getImageUrl(offer.image)}
                         alt={offer.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -204,7 +205,7 @@ export default function OffersSection({ title = "Offers", subtitle, initialData 
               {offer.image && (
                 <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-saffron-50 to-gold-50">
                   <Image
-                    src={offer.image}
+                    src={getImageUrl(offer.image)}
                     alt={offer.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"

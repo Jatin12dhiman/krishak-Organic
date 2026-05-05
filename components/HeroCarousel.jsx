@@ -6,30 +6,54 @@ import { api } from "@/lib/api";
 import Button from "./ui/Button";
 import { ArrowRight, Leaf, ShoppingBag, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getImageUrl } from "@/lib/utils";
 
-const defaultContent = {
-  tagline: "🌿 Fresh & Organic Products Delivered to Your Door",
-  title: "Live Naturally,",
-  lastWord: "Eat Organic! 🌱",
-  description: "Shop our collection of fresh organic vegetables, fruits, pulses, and natural products grown with care directly from farms across India."
-};
+const defaultSlides = [
+  {
+    image: "/kr1.jpg",
+    tagline: "🌿 Fresh & Organic Products Delivered to Your Door",
+    title: "Live Naturally,",
+    description:
+      "Shop our collection of fresh organic vegetables, fruits, pulses, and natural products grown with care directly from farms across India.",
+  },
+  {
+    image: "/kr2.jpg",
+    tagline: "🌾 Straight from the Farm to Your Table",
+    title: "Pure, Natural &",
+    description:
+      "Experience the real taste of India's finest organic produce — grown without chemicals, harvested with love, delivered fresh.",
+  },
+  {
+    image: "/kr3.jpg",
+    tagline: "🥦 100% Certified Organic Goodness",
+    title: "Healthy Families,",
+    description:
+      "Give your family the nutrition they deserve. Our certified organic range covers everything from staple grains to exotic superfoods.",
+  },
+  {
+    image: "/kr4.jpg",
+    tagline: "🌻 Supporting Indian Farmers Since Day One",
+    title: "Grow Together,",
+    description:
+      "Every purchase supports local Indian farmers practicing sustainable agriculture. Good for you, good for the farmer, good for the earth.",
+  },
+];
+
+const defaultContent = defaultSlides[0];
 
 export default function HeroCarousel({ initialImages }) {
-  const getInitialImages = () => {
-    if (initialImages && initialImages.length > 0) return initialImages;
-    return [{ ...defaultContent }];
-  };
-
-  const [images, setImages] = useState(getInitialImages());
+  const [images, setImages] = useState(
+    initialImages && initialImages.length > 0 ? initialImages : defaultSlides
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(!initialImages && (!images || images.length === 0));
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (!initialImages && images.length === 0) {
+    if (!initialImages || initialImages.length === 0) {
       fetchHeroImages();
     }
-  }, [initialImages, images.length]);
+  }, [initialImages]);
 
   const fetchHeroImages = async () => {
     try {
@@ -42,11 +66,11 @@ export default function HeroCarousel({ initialImages }) {
       ) {
         setImages(data.heroImages);
       } else {
-        setImages([{ ...defaultContent }]);
+        setImages(defaultSlides);
       }
     } catch (error) {
       console.error("Failed to load hero images:", error);
-      setImages([{ ...defaultContent }]);
+      setImages(defaultSlides);
     } finally {
       setLoading(false);
     }
@@ -69,12 +93,24 @@ export default function HeroCarousel({ initialImages }) {
     const current = images[currentIndex] || {};
 
     // Per-field fallbacks
-    const tagline = current.tagline && current.tagline.trim() ? current.tagline : defaultContent.tagline;
-    const description = current.description && current.description.trim() ? current.description : defaultContent.description;
-    const image = current.image || null;
+    const tagline =
+      current.tagline && current.tagline.trim()
+        ? current.tagline
+        : defaultContent.tagline;
+    const description =
+      current.description && current.description.trim()
+        ? current.description
+        : defaultContent.description;
+    const image =
+      current.image
+        ? (getImageUrl(current.image) || current.image)
+        : defaultContent.image;
 
     // Title logic
-    const rawTitle = current.title && current.title.trim() ? current.title : defaultContent.title;
+    const rawTitle =
+      current.title && current.title.trim()
+        ? current.title
+        : defaultContent.title;
     const { mainTitle, lastWord } = getTitleParts(rawTitle);
 
     return { tagline, mainTitle, lastWord, description, image };
@@ -95,7 +131,9 @@ export default function HeroCarousel({ initialImages }) {
   };
 
   if (loading) {
-    return <section className="w-full h-[60vh] md:h-[65vh] bg-emerald-50 animate-pulse" />;
+    return (
+      <section className="w-full h-[60vh] md:h-[65vh] bg-emerald-50 animate-pulse" />
+    );
   }
 
   if (images.length === 0) return null;
@@ -105,9 +143,9 @@ export default function HeroCarousel({ initialImages }) {
   return (
     <section className="relative h-[60vh] md:h-[65vh] min-h-[450px] md:min-h-[600px]">
       <div className="absolute inset-0 overflow-hidden bg-linear-to-br from-emerald-50 via-green-50 to-teal-50">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-emerald-200 rounded-full blur-2xl opacity-20"></div>
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-green-200 rounded-full blur-2xl opacity-20"></div>
-        <AnimatePresence mode="wait">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-emerald-200 rounded-full blur-2xl opacity-10"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-green-200 rounded-full blur-2xl opacity-10"></div>
+        <AnimatePresence initial={false}>
           <motion.div
             key={currentIndex}
             initial={{ opacity: 0, y: 30 }}
@@ -122,24 +160,14 @@ export default function HeroCarousel({ initialImages }) {
               transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
               className="relative w-full h-full"
             >
-              {content.image ? (
-                <Image
-                  src={content.image}
-                  alt={`Hero image ${currentIndex + 1}`}
-                  fill
-                  priority={currentIndex === 0}
-                  className="object-cover brightness-[1.05] contrast-[1.05]"
-                  sizes="100vw"
-                />
-              ) : (
-                // Beautiful organic gradient background when no image is set
-                <div className="w-full h-full bg-linear-to-br from-emerald-800 via-green-700 to-teal-800 relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-20" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"}}></div>
-                  <div className="absolute top-10 right-10 text-9xl opacity-30">🌿</div>
-                  <div className="absolute bottom-10 left-10 text-8xl opacity-25">🌱</div>
-                  <div className="absolute top-1/3 right-1/4 text-7xl opacity-20">🥕</div>
-                </div>
-              )}
+              <Image
+                src={content.image}
+                alt={`Hero image ${currentIndex + 1}`}
+                fill
+                priority={true}
+                className="object-cover brightness-[1.05] contrast-[1.05]"
+                sizes="100vw"
+              />
             </motion.div>
           </motion.div>
         </AnimatePresence>
@@ -153,10 +181,11 @@ export default function HeroCarousel({ initialImages }) {
                 onClick={() => goToSlide(index)}
                 whileHover={{ scale: 1.3 }}
                 whileTap={{ scale: 0.9 }}
-                className={`h-3 rounded-full transition-all backdrop-blur-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${index === currentIndex
-                  ? "bg-emerald-500 w-12 shadow-lg shadow-emerald-500/60"
-                  : "bg-white/70 hover:bg-white/90 w-3 border border-white/50"
-                  }`}
+                className={`h-3 rounded-full transition-all backdrop-blur-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                  index === currentIndex
+                    ? "bg-emerald-500 w-12 shadow-lg shadow-emerald-500/60"
+                    : "bg-white/70 hover:bg-white/90 w-3 border border-white/50"
+                }`}
                 aria-label={`Go to slide ${index + 1}`}
                 aria-current={index === currentIndex ? "true" : "false"}
               />
@@ -200,7 +229,8 @@ export default function HeroCarousel({ initialImages }) {
               >
                 {content.mainTitle}
                 <span className="md:block mt-1 md:mt-2 bg-linear-to-r from-emerald-400 via-green-300 to-emerald-400 bg-clip-text text-transparent drop-shadow-none">
-                  {" "}{content.lastWord}
+                  {" "}
+                  {content.lastWord}
                 </span>
               </motion.h1>
             </AnimatePresence>

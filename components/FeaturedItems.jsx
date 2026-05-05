@@ -9,6 +9,7 @@ import { Star, ShoppingCart, Sparkles, Tag } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Button from "@/components/ui/Button.jsx";
+import { getImageUrl } from "@/lib/utils";
 
 export default function FeaturedItems({ title = "Featured Items", subtitle, initialData }) {
   const router = useRouter();
@@ -23,16 +24,17 @@ export default function FeaturedItems({ title = "Featured Items", subtitle, init
     (async () => {
       try {
         const res = await api.get("/items", {
-          params: {
-            isFeatured: "true",
-            isActive: "true",
-            limit: 8,
-            page: 1
-          },
+          params: { isFeatured: "true", isActive: "true", limit: 8, page: 1 },
         });
         const data = res?.data ?? res;
-        const list = Array.isArray(data) ? data : data?.items || [];
-        console.log(list);
+        let list = Array.isArray(data) ? data : data?.items || [];
+        if (list.length === 0) {
+          const fallback = await api.get("/items", {
+            params: { isActive: "true", limit: 8, page: 1 },
+          });
+          const fd = fallback?.data ?? fallback;
+          list = Array.isArray(fd) ? fd : fd?.items || [];
+        }
         if (active) setItems(list);
       } catch (e) {
         if (active) console.error("Failed to load featured items:", e);
@@ -209,7 +211,7 @@ export default function FeaturedItems({ title = "Featured Items", subtitle, init
             <div className="relative h-64 bg-gray-100 overflow-hidden shrink-0">
               {item.image ? (
                 <Image
-                  src={item.image}
+                  src={getImageUrl(item.image)}
                   alt={item.name}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-300"

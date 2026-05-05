@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import Skeleton from "@/components/ui/Skeleton.jsx";
 import { Leaf, ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 export default function CategorySlider({ title = "Categories", subtitle, initialData }) {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function CategorySlider({ title = "Categories", subtitle, initial
   }, [initialData]);
 
   const handleCategoryClick = (categoryId) => {
-    router.push(`/menu?category=${categoryId}`);
+    router.push(`/products?category=${categoryId}`);
   };
 
   if (isLoading) {
@@ -123,7 +124,7 @@ export default function CategorySlider({ title = "Categories", subtitle, initial
             <div className="absolute inset-0">
               {cat.image ? (
                 <Image
-                  src={cat.image}
+                  src={getImageUrl(cat.image)}
                   alt={cat.name}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-500"

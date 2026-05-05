@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import Skeleton from "@/components/ui/Skeleton.jsx";
 import { Star, Quote } from "lucide-react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 export default function TestimonialsSection({ title = "Testimonials", subtitle, initialData }) {
   const [testimonials, setTestimonials] = useState(initialData || []);
@@ -98,7 +99,7 @@ export default function TestimonialsSection({ title = "Testimonials", subtitle, 
               {currentTestimonial.image ? (
                 <div className="relative w-16 h-16 rounded-full overflow-hidden">
                   <Image
-                    src={currentTestimonial.image}
+                    src={getImageUrl(currentTestimonial.image)}
                     alt={currentTestimonial.name}
                     fill
                     className="object-cover"

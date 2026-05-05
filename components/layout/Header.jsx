@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import api from "@/lib/api";
+import { getImageUrl } from "@/lib/utils";
 
 export default function Header({ initialCategories, initialConfig }) {
   const router = useRouter();
@@ -52,10 +53,9 @@ export default function Header({ initialCategories, initialConfig }) {
     { label: "Home", href: "/" },
     ...categories.slice(0, 5).map(category => ({
       label: category.name,
-      href: `/menu?category=${category._id}`
+      href: `/products?category=${category._id}`
     })),
     { label: "Products", href: "/products" },
-    { label: "Menu", href: "/menu" },
   ];
 
   // Fetch categories
@@ -558,7 +558,7 @@ export default function Header({ initialCategories, initialConfig }) {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/menu?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
   };
@@ -1075,7 +1075,7 @@ export default function Header({ initialCategories, initialConfig }) {
                           <div className="shrink-0">
                             {hasValidImage ? (
                               <Image
-                                src={imageSrc}
+                                src={getImageUrl(imageSrc)}
                                 alt={itemName}
                                 width={80}
                                 height={80}

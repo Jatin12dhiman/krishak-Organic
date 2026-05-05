@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, MapPin, Truck, Banknote, CreditCard, ChevronRight, Loader2, CheckCircle } from "lucide-react";
+import { ShoppingBag, MapPin, Truck, Banknote, CreditCard, ChevronRight, Loader2, CheckCircle, Wallet, Gift } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { api } from "@/lib/api";
 import { useAuth } from "@/app/AuthProvider.jsx";
@@ -25,6 +25,14 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("COD");
+
+  // Wallet
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
+
+  // Referral first-order discount (auto-applied)
+  const [referralDiscount, setReferralDiscount] = useState(0);
+  const [referralDiscountPercent, setReferralDiscountPercent] = useState(0);
 
   const [address, setAddress] = useState({
     name: user?.name || "",
@@ -63,7 +71,6 @@ export default function CheckoutPage() {
           }));
 
         if (user?._id) {
-          // Logged-in: fetch fresh cart from API
           const cartRes = await api.get(`/users/${user._id}/get-carts`).catch(() => null);
           const cartData = cartRes?.data ?? cartRes;
           const apiItems = cartData?.items || [];
@@ -71,12 +78,24 @@ export default function CheckoutPage() {
           if (apiItems.length > 0) {
             setCart(normalizeItems(apiItems));
           } else {
-            // API returned empty or failed — fall back to localStorage
             const stored = JSON.parse(localStorage.getItem("cart") || "{}");
             setCart(normalizeItems(stored?.items));
           }
+
+          // Load wallet balance
+          const meRes = await api.get("/users/me").catch(() => null);
+          const walletBal = meRes?.data?.walletBalance || 0;
+          setWalletBalance(walletBal);
+
+          // Check first-order referral discount
+          const refRes = await api.get(`/referrals/first-order-discount?userId=${user._id}`).catch((e) => {
+            console.error('[Referral discount check failed]', e?.message);
+            return null;
+          });
+          if (refRes?.data?.eligible) {
+            setReferralDiscountPercent(refRes.data.discountPercent || 0);
+          }
         } else {
-          // Guest: read from localStorage
           const stored = JSON.parse(localStorage.getItem("cart") || "{}");
           setCart(normalizeItems(stored?.items));
         }
@@ -99,15 +118,28 @@ export default function CheckoutPage() {
   const deliveryFree = systemConfig?.deliveryChargeFreeAbove && subtotal >= systemConfig.deliveryChargeFreeAbove;
   const deliveryCharge = deliveryFree ? 0 : (systemConfig?.deliveryCharges || 0);
   const gstAmount = Math.round((subtotal * (systemConfig?.gstPercentage || 0)) / 100);
-  const discount = coupon?.discountAmount || 0;
-  const total = subtotal + deliveryCharge + gstAmount - discount;
+
+  // Referral discount: compute from percent whenever subtotal changes
+  const computedReferralDiscount = referralDiscountPercent > 0
+    ? Math.round((subtotal * referralDiscountPercent) / 100)
+    : 0;
+
+  const couponDiscount = coupon?.discountAmount || 0;
+  const beforeWallet = subtotal + deliveryCharge + gstAmount - couponDiscount - computedReferralDiscount;
+  const walletUsed = useWallet ? Math.min(walletBalance, Math.max(0, beforeWallet)) : 0;
+  const totalDiscount = couponDiscount + computedReferralDiscount + walletUsed;
+  const total = Math.max(0, subtotal + deliveryCharge + gstAmount - totalDiscount);
 
   const applyCoupon = async () => {
     if (!couponCode.trim()) return toast.error("Enter a coupon code");
     setApplyingCoupon(true);
     try {
       const res = await api.post("/coupons/apply", { code: couponCode, cartTotal: subtotal });
-      setCoupon({ code: couponCode, discountAmount: res.data?.discountAmount || 0 });
+      setCoupon({
+        code: couponCode,
+        discountAmount: res.data?.discountAmount || 0,
+        couponId: res.data?.couponId || null,
+      });
       toast.success(`Coupon applied! Saved ${formatPrice(res.data?.discountAmount)}`);
     } catch (err) {
       toast.error(err.message || "Invalid coupon");
@@ -121,7 +153,6 @@ export default function CheckoutPage() {
       return toast.error("Please fill in all delivery address fields");
     }
     if (cart.length === 0) return toast.error("Your cart is empty");
-
     if (paymentMethod !== "COD") {
       return toast.error("Online payment coming soon. Please use COD for now.");
     }
@@ -129,6 +160,8 @@ export default function CheckoutPage() {
     setPlacing(true);
     try {
       const orderPayload = {
+        userId: user?._id || null,
+        isGuestOrder: !user?._id,
         items: cart.map(item => ({
           itemId: item.itemId || item._id,
           name: item.name,
@@ -143,13 +176,16 @@ export default function CheckoutPage() {
         subtotal,
         tax: gstAmount,
         shippingCharges: deliveryCharge,
-        discount,
+        discount: totalDiscount,
         total,
         couponCode: coupon?.code || "",
+        couponId: coupon?.couponId || null,
+        walletAmountUsed: walletUsed,
       };
 
       const res = await api.post("/orders", orderPayload);
       if (res.data) {
+        localStorage.removeItem("cart");
         toast.success("Order placed successfully!");
         router.push(`/order-success?orderId=${res.data.orderId || res.data._id}`);
       }
@@ -173,7 +209,7 @@ export default function CheckoutPage() {
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-3xl font-black text-gray-900 mb-8">Checkout</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left: Address + Payment */}
+          {/* Left: Address + Payment + Offers */}
           <div className="lg:col-span-2 space-y-6">
             {/* Delivery Address */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
@@ -254,6 +290,43 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Referral First-Order Discount (auto-shown) */}
+            {computedReferralDiscount > 0 && (
+              <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-4 flex items-center gap-3">
+                <Gift size={22} className="text-green-600 shrink-0" />
+                <div>
+                  <p className="font-black text-green-800">🎉 Referral Reward Applied!</p>
+                  <p className="text-sm text-green-700">
+                    {referralDiscountPercent}% off on your first order — you're saving {formatPrice(computedReferralDiscount)}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Wallet */}
+            {user && walletBalance > 0 && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-3">
+                <h2 className="font-black text-gray-800 text-lg flex items-center gap-2">
+                  <Wallet size={20} className="text-blue-600" /> Wallet Balance
+                </h2>
+                <div className="flex items-center justify-between bg-blue-50 rounded-xl p-4">
+                  <div>
+                    <p className="font-black text-blue-800 text-lg">{formatPrice(walletBalance)}</p>
+                    <p className="text-xs text-blue-600 mt-0.5">
+                      {useWallet ? `Using ${formatPrice(walletUsed)} from wallet` : "Click to use wallet balance"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setUseWallet(v => !v)}
+                    className={`w-12 h-6 rounded-full transition-colors relative shrink-0 ${useWallet ? "bg-blue-600" : "bg-gray-300"}`}
+                  >
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${useWallet ? "right-1" : "left-1"}`} />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Coupon */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
               <h2 className="font-black text-gray-800 text-lg">Have a Coupon?</h2>
@@ -305,7 +378,22 @@ export default function CheckoutPage() {
                 {deliveryCharge > 0 && <div className="flex justify-between text-gray-600"><span>Delivery</span><span>{formatPrice(deliveryCharge)}</span></div>}
                 {deliveryCharge === 0 && systemConfig?.deliveryChargeFreeAbove > 0 && <div className="flex justify-between text-green-600 font-bold"><span>Free Delivery</span><span>₹0</span></div>}
                 {gstAmount > 0 && <div className="flex justify-between text-gray-600"><span>GST ({systemConfig?.gstPercentage}%)</span><span>{formatPrice(gstAmount)}</span></div>}
-                {discount > 0 && <div className="flex justify-between text-green-600 font-bold"><span>Discount</span><span>-{formatPrice(discount)}</span></div>}
+                {computedReferralDiscount > 0 && (
+                  <div className="flex justify-between text-green-600 font-bold">
+                    <span>Referral ({referralDiscountPercent}%)</span>
+                    <span>-{formatPrice(computedReferralDiscount)}</span>
+                  </div>
+                )}
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-green-600 font-bold">
+                    <span>Coupon</span><span>-{formatPrice(couponDiscount)}</span>
+                  </div>
+                )}
+                {walletUsed > 0 && (
+                  <div className="flex justify-between text-blue-600 font-bold">
+                    <span>Wallet</span><span>-{formatPrice(walletUsed)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-black text-gray-900 text-base pt-2 border-t"><span>Total</span><span>{formatPrice(total)}</span></div>
               </div>
 
