@@ -160,8 +160,8 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!address.name || !address.phoneNumber || !address.street || !address.city || !address.state || !address.zipCode || !address.date || !address.deliveryTime) {
-      return toast.error("Please fill in all required delivery fields (including date and time)");
+    if (!address.name || !address.phoneNumber || !address.street || !address.city || !address.state || !address.zipCode) {
+      return toast.error("Please fill in all required delivery fields");
     }
     if (cart.length === 0) return toast.error("Your cart is empty");
     if (paymentMethod !== "COD") {
@@ -280,23 +280,21 @@ export default function CheckoutPage() {
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium" />
                 </div>
                 {/* <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">Delivery Date *</label>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Delivery Date (Optional)</label>
                   <input value={address.date} onChange={e => setAddress(a => ({ ...a, date: e.target.value }))}
                     type="date"
                     min={(() => {
                       const minDate = new Date();
-                      minDate.setDate(minDate.getDate() + (systemConfig?.minimumDeliveryDays || 3));
+                      minDate.setDate(minDate.getDate() + (systemConfig?.minimumDeliveryDays || 0));
                       return minDate.toISOString().split("T")[0];
                     })()}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium"
-                    required />
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">Delivery Time *</label>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Delivery Time (Optional)</label>
                   <input value={address.deliveryTime} onChange={e => setAddress(a => ({ ...a, deliveryTime: e.target.value }))}
                     type="time"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium"
-                    required />
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-gray-600 mb-1">Custom Message (Optional)</label>
