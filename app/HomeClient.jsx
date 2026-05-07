@@ -36,7 +36,6 @@ export default function HomeClient({
         newArrivals: { title: "New Arrivals", subtitle: "" },
         categories: { title: "Categories", subtitle: "" },
         testimonials: { title: "Testimonials", subtitle: "" },
-        featuredBoxes: { title: "Featured Boxes", subtitle: "" },
     });
 
     useEffect(() => {

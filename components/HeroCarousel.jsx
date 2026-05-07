@@ -132,7 +132,7 @@ export default function HeroCarousel({ initialImages }) {
 
   if (loading) {
     return (
-      <section className="w-full h-[60vh] md:h-[65vh] bg-emerald-50 animate-pulse" />
+      <section className="w-full h-[55vh] md:h-[65vh] min-h-[380px] md:min-h-[600px] bg-emerald-50 animate-pulse" />
     );
   }
 
@@ -141,7 +141,7 @@ export default function HeroCarousel({ initialImages }) {
   const content = getCurrentContent();
 
   return (
-    <section className="relative h-[60vh] md:h-[65vh] min-h-[450px] md:min-h-[600px]">
+    <section className="relative h-[55vh] md:h-[65vh] min-h-[380px] md:min-h-[600px]">
       <div className="absolute inset-0 overflow-hidden bg-linear-to-br from-emerald-50 via-green-50 to-teal-50">
         <div className="absolute top-10 left-10 w-32 h-32 bg-emerald-200 rounded-full blur-2xl opacity-10"></div>
         <div className="absolute bottom-20 right-20 w-40 h-40 bg-green-200 rounded-full blur-2xl opacity-10"></div>

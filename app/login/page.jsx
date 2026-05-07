@@ -131,12 +131,12 @@ function LoginContent() {
   return (
     <>
       <div className="min-h-screen bg-emerald-50 flex">
-        <div className="hidden md:flex flex-1 relative rounded-r-2xl">
+        <div className="hidden md:flex flex-1 relative rounded-r-2xl overflow-hidden">
           <Image
-            src="https://images.unsplash.com/photo-1595196112051-958225506a3e?w=800&auto=format&fit=crop&q=60"
+            src="/kr1.jpg"
             alt="Organic farming and fresh vegetables"
             fill
-            className="object-cover rounded-r-3xl"
+            className="object-cover"
             priority
           />
         </div>

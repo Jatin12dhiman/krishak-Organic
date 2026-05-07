@@ -567,11 +567,11 @@ export default function Header({ initialCategories, initialConfig }) {
     <>
       {/* Top Promotional Banner */}
       {headerBanner?.title && (
-        <div className="bg-neutral-900 text-white py-2.5 px-4 text-center text-xs md:text-sm">
+        <div className="bg-neutral-900 text-white py-1.5 px-4 text-center text-[11px] md:text-xs">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center gap-1 font-medium"
+            className="flex flex-col items-center justify-center gap-0.5 font-medium"
           >
             <div className="flex items-center justify-center gap-2">
               <span className="hidden md:inline">🎉</span>
@@ -588,18 +588,18 @@ export default function Header({ initialCategories, initialConfig }) {
 
       <header className="sticky top-0 z-50 bg-white border-b border-neutral-200 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-18">
+          <div className="flex items-center justify-between h-14 md:h-16">
             {/* Logo Section */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-2 cursor-pointer h-12 md:h-18"
+              className="flex items-center gap-2 cursor-pointer h-10 md:h-14"
               onClick={() => router.push("/")}
             >
-              <div className="flex items-center gap-2 bg-emerald-100 p-2 rounded-xl">
-                <span className="text-2xl">🌿</span>
+              <div className="flex items-center justify-center bg-emerald-100 w-8 h-8 md:w-10 md:h-10 rounded-lg">
+                <span className="text-lg md:text-xl">🌿</span>
               </div>
-              <span className="text-xl md:text-2xl font-bold text-emerald-600 tracking-tight">
+              <span className="text-lg md:text-xl font-bold text-emerald-600 tracking-tight">
                 Krishak
               </span>
             </motion.div>
@@ -617,7 +617,7 @@ export default function Header({ initialCategories, initialConfig }) {
                   placeholder="Search organic products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-2 md:py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
                 />
               </form>
             </nav>

@@ -153,7 +153,7 @@ function SignupContent() {
       <div className="min-h-screen bg-emerald-50 flex">
         <div className="hidden md:flex flex-1 relative ">
           <Image
-            src="https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&auto=format&fit=crop&q=60"
+            src="/kr2.jpg"
             alt="Organic farming green fields"
             fill
             className="object-cover rounded-r-3xl"

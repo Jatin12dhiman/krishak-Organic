@@ -43,6 +43,9 @@ export default function CheckoutPage() {
     state: "",
     zipCode: "",
     country: "India",
+    date: "",
+    deliveryTime: "",
+    message: "",
   });
 
   const [couponCode, setCouponCode] = useState("");
@@ -115,8 +118,16 @@ export default function CheckoutPage() {
   }, [user]);
 
   const subtotal = cart.reduce((s, item) => s + item.price * item.quantity, 0);
+  
   const deliveryFree = systemConfig?.deliveryChargeFreeAbove && subtotal >= systemConfig.deliveryChargeFreeAbove;
   const deliveryCharge = deliveryFree ? 0 : (systemConfig?.deliveryCharges || 0);
+
+  const packagingFree = systemConfig?.packagingChargeFreeAbove && subtotal >= systemConfig.packagingChargeFreeAbove;
+  let packagingCharge = 0;
+  if (!packagingFree && systemConfig?.packagingCharges?.applySnacksPackagingCharge) {
+    packagingCharge = systemConfig?.packagingCharges?.snacksPackagingCharge || 0;
+  }
+
   const gstAmount = Math.round((subtotal * (systemConfig?.gstPercentage || 0)) / 100);
 
   // Referral discount: compute from percent whenever subtotal changes
@@ -125,10 +136,10 @@ export default function CheckoutPage() {
     : 0;
 
   const couponDiscount = coupon?.discountAmount || 0;
-  const beforeWallet = subtotal + deliveryCharge + gstAmount - couponDiscount - computedReferralDiscount;
+  const beforeWallet = subtotal + deliveryCharge + packagingCharge + gstAmount - couponDiscount - computedReferralDiscount;
   const walletUsed = useWallet ? Math.min(walletBalance, Math.max(0, beforeWallet)) : 0;
   const totalDiscount = couponDiscount + computedReferralDiscount + walletUsed;
-  const total = Math.max(0, subtotal + deliveryCharge + gstAmount - totalDiscount);
+  const total = Math.max(0, subtotal + deliveryCharge + packagingCharge + gstAmount - totalDiscount);
 
   const applyCoupon = async () => {
     if (!couponCode.trim()) return toast.error("Enter a coupon code");
@@ -149,8 +160,8 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!address.name || !address.phoneNumber || !address.street || !address.city || !address.state || !address.zipCode) {
-      return toast.error("Please fill in all delivery address fields");
+    if (!address.name || !address.phoneNumber || !address.street || !address.city || !address.state || !address.zipCode || !address.date || !address.deliveryTime) {
+      return toast.error("Please fill in all required delivery fields (including date and time)");
     }
     if (cart.length === 0) return toast.error("Your cart is empty");
     if (paymentMethod !== "COD") {
@@ -176,18 +187,22 @@ export default function CheckoutPage() {
         subtotal,
         tax: gstAmount,
         shippingCharges: deliveryCharge,
+        packagingCharges: packagingCharge,
         discount: totalDiscount,
         total,
         couponCode: coupon?.code || "",
         couponId: coupon?.couponId || null,
         walletAmountUsed: walletUsed,
+        estimatedDelivery: address.date ? new Date(address.date) : null,
+        deliveryTime: address.deliveryTime || null,
+        notes: address.message || "",
       };
 
       const res = await api.post("/orders", orderPayload);
       if (res.data) {
         localStorage.removeItem("cart");
         toast.success("Order placed successfully!");
-        router.push(`/order-success?orderId=${res.data.orderId || res.data._id}`);
+        router.push(`/track-order?orderId=${res.data.orderId || res.data._id}&key=track-order&mobile=${address.phoneNumber || user?.phoneNumber || ""}`);
       }
     } catch (err) {
       toast.error(err.message || "Failed to place order");
@@ -264,6 +279,32 @@ export default function CheckoutPage() {
                   <input value={address.country} onChange={e => setAddress(a => ({ ...a, country: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium" />
                 </div>
+                {/* <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Delivery Date *</label>
+                  <input value={address.date} onChange={e => setAddress(a => ({ ...a, date: e.target.value }))}
+                    type="date"
+                    min={(() => {
+                      const minDate = new Date();
+                      minDate.setDate(minDate.getDate() + (systemConfig?.minimumDeliveryDays || 3));
+                      return minDate.toISOString().split("T")[0];
+                    })()}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium"
+                    required />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Delivery Time *</label>
+                  <input value={address.deliveryTime} onChange={e => setAddress(a => ({ ...a, deliveryTime: e.target.value }))}
+                    type="time"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium"
+                    required />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Custom Message (Optional)</label>
+                  <textarea value={address.message} onChange={e => setAddress(a => ({ ...a, message: e.target.value }))}
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-green-500 outline-none font-medium resize-y"
+                    placeholder="Add a personal message for the recipient..." />
+                </div> */}
               </div>
             </div>
 
@@ -375,8 +416,13 @@ export default function CheckoutPage() {
               </div>
               <div className="border-t border-gray-50 pt-4 space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+                
                 {deliveryCharge > 0 && <div className="flex justify-between text-gray-600"><span>Delivery</span><span>{formatPrice(deliveryCharge)}</span></div>}
                 {deliveryCharge === 0 && systemConfig?.deliveryChargeFreeAbove > 0 && <div className="flex justify-between text-green-600 font-bold"><span>Free Delivery</span><span>₹0</span></div>}
+                
+                {packagingCharge > 0 && <div className="flex justify-between text-gray-600"><span>Packaging</span><span>{formatPrice(packagingCharge)}</span></div>}
+                {packagingCharge === 0 && systemConfig?.packagingCharges?.applySnacksPackagingCharge && systemConfig?.packagingChargeFreeAbove > 0 && <div className="flex justify-between text-green-600 font-bold"><span>Free Packaging</span><span>₹0</span></div>}
+                
                 {gstAmount > 0 && <div className="flex justify-between text-gray-600"><span>GST ({systemConfig?.gstPercentage}%)</span><span>{formatPrice(gstAmount)}</span></div>}
                 {computedReferralDiscount > 0 && (
                   <div className="flex justify-between text-green-600 font-bold">
@@ -398,8 +444,14 @@ export default function CheckoutPage() {
               </div>
 
               {systemConfig?.deliveryChargeFreeAbove > 0 && subtotal < systemConfig.deliveryChargeFreeAbove && (
-                <div className="bg-blue-50 rounded-xl p-3 text-xs text-blue-700 font-bold">
+                <div className="bg-blue-50 rounded-xl p-3 text-xs text-blue-700 font-bold mb-2">
                   Add {formatPrice(systemConfig.deliveryChargeFreeAbove - subtotal)} more for free delivery!
+                </div>
+              )}
+              
+              {systemConfig?.packagingChargeFreeAbove > 0 && subtotal < systemConfig.packagingChargeFreeAbove && systemConfig?.packagingCharges?.applySnacksPackagingCharge && (
+                <div className="bg-green-50 rounded-xl p-3 text-xs text-green-700 font-bold">
+                  Add {formatPrice(systemConfig.packagingChargeFreeAbove - subtotal)} more for free packaging!
                 </div>
               )}
 

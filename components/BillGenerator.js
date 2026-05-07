@@ -2,11 +2,11 @@ import jsPDF from "jspdf";
 
 export const generateBill = (order, invoice) => {
   // Default values involving company details
-  const companyName = "Swaadm Foods LLP";
+  const companyName = "Krishak Organic";
   const addressLines = [
-    "SouthCity -2 ,Sector 49",
-    "Gurgaon",
-    "Ph: 7303888707"
+    "Fresh & Natural Products",
+    "India",
+    ""
   ];
 
   // Invoice/Order details
